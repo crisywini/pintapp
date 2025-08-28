@@ -8,7 +8,7 @@ class MenuScreen extends StatelessWidget {
     final createOutfitDetector = _CustomGestureDetector(
       imageUrl: "",
       valueName: 'Crearse la pinta',
-      onPressed: () => print('Crearse la pinta'),
+      onPressed: () => {Navigator.pushNamed(context, '/add-item')},
       color: Colors.blue,
     );
     final addItemsDetector = _CustomGestureDetector(

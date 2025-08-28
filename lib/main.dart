@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pintapp/presentation/screens/add_item_screen.dart';
 import 'package:pintapp/presentation/screens/menu_screen.dart';
 
 void main() => runApp(App());
@@ -9,6 +10,8 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      routes: {'/add-item': (context) => AddItemScreen()},
+
       debugShowCheckedModeBanner: false,
       title: 'PintApp',
       home: Scaffold(
