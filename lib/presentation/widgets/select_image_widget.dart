@@ -74,7 +74,7 @@ class _SelectImageWidgetState extends State<SelectImageWidget> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Configuración'),
+            child: Text('Cerrar'),
           ),
           TextButton(
             onPressed: () {
