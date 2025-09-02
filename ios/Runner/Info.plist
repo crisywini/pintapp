@@ -46,17 +46,17 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 
-	<!-- Permiso para cámara -->
 	<key>NSCameraUsageDescription</key>
-	<string>Esta app necesita acceso a la cámara para tomar fotos</string>
+	<string>Esta aplicación necesita acceso a la cámara para tomar fotos</string>
 
-	<!-- Permiso para galería de fotos (por si también la usas) -->
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Esta app necesita acceso a la galería para seleccionar fotos</string>
+	<string>Esta aplicación necesita acceso a las fotos para seleccionar imágenes</string>
 
-	<!-- Permiso para guardar fotos (opcional) -->
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Esta app necesita guardar fotos en tu galería</string>
+	<string>Esta aplicación necesita guardar fotos en tu galería</string>
 
+	<!-- ESTE ES CLAVE para permission_handler -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Esta aplicación necesita acceso a las fotos</string>
 </dict>
 </plist>

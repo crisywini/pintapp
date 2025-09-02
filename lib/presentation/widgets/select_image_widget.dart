@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -31,11 +30,11 @@ class _SelectImageWidgetState extends State<SelectImageWidget> {
   }
 
   Future<void> _pickImage() async {
-    PermissionStatus cameraStatus = await Permission.camera.status;
+    final PermissionStatus cameraStatus = await Permission.camera.request();
+    final PermissionStatus photosStatus = await Permission.photos.request();
 
-    if (cameraStatus.isDenied) {
-      cameraStatus = await Permission.camera.request();
-    }
+    print('Camera status: $cameraStatus');
+    print('Photos status: $photosStatus');
 
     if (cameraStatus.isGranted) {
       try {
@@ -48,12 +47,11 @@ class _SelectImageWidgetState extends State<SelectImageWidget> {
           });
         }
       } catch (e) {
-        _showError('Error al tomar la foto');
+        print('Error: $e');
+        _showError('Error al tomar la foto: $e');
       }
-    } else if (cameraStatus.isPermanentlyDenied) {
-      _showPermissionDialog();
     } else {
-      _showError('Permiso de la cámara requerido bebé');
+      _showPermissionDialog();
     }
   }
 
