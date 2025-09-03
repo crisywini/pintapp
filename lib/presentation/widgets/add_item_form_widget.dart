@@ -61,7 +61,7 @@ class _CustomAddItemFormWidgetState extends State<_FormListViewWidget> {
             ),
             value: _category,
             items: categoryElements
-                .map((e) => DropdownMenuItem(child: Text(e), value: e))
+                .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                 .toList(),
             onChanged: (value) => setState(() => _category = value),
           ),

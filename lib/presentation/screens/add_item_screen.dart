@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pintapp/presentation/widgets/add_item_form_widget.dart';
-import 'package:pintapp/presentation/widgets/button_gesture_detector_widget.dart';
-import 'package:pintapp/presentation/widgets/select_image_widget.dart';
 
 class AddItemScreen extends StatelessWidget {
   const AddItemScreen({super.key});

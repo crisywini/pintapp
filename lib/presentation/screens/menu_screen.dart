@@ -47,7 +47,6 @@ class _CustomGestureDetector extends StatelessWidget {
   final Color color;
 
   const _CustomGestureDetector({
-    super.key,
     required this.imageUrl,
     required this.valueName,
     required this.onPressed,

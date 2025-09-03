@@ -54,9 +54,5 @@
 
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Esta aplicación necesita guardar fotos en tu galería</string>
-
-	<!-- ESTE ES CLAVE para permission_handler -->
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Esta aplicación necesita acceso a las fotos</string>
 </dict>
 </plist>
