@@ -5,7 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class SelectImageWidget extends StatefulWidget {
-  const SelectImageWidget({super.key});
+  final Function(String?) onImageSelected;
+
+  const SelectImageWidget({Key? key, required this.onImageSelected})
+    : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _SelectImageWidgetState();
@@ -63,6 +66,7 @@ class _SelectImageWidgetState extends State<SelectImageWidget> {
         setState(() {
           _imagePath = image.path;
         });
+        widget.onImageSelected(image.path);
       }
     } catch (e) {
       _showError('Error al tomar la foto: $e');
