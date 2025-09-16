@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pintapp/config/helpers/add_item_helper.dart';
 import 'package:pintapp/infrastructure/models/add_item_request.dart';
 import 'package:pintapp/presentation/widgets/button_gesture_detector_widget.dart';
 import 'package:pintapp/presentation/widgets/select_image_widget.dart';
@@ -6,21 +7,28 @@ import 'package:pintapp/presentation/widgets/select_image_widget.dart';
 class AddItemFormWidget extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   final _formListKey = GlobalKey<_CustomAddItemFormWidgetState>();
+  final _addItemHelper = AddItemHelper();
 
   AddItemFormWidget({super.key});
 
-  void _saveForm(BuildContext context) {
+  void _saveForm(BuildContext context) async {
     bool isFormValid = _formKey.currentState?.validate() ?? false;
     bool hasImage = _formListKey.currentState?.imagePath != null;
     if (isFormValid) {
       if (hasImage) {
-        var request = AddItemRequest(
-          category: _formListKey.currentState!._category!,
-          imagePath: _formListKey.currentState!.imagePath!,
-        );
-
-        _formKey.currentState?.reset();
-        _formListKey.currentState!.imagePath = null;
+        try {
+          var request = AddItemRequest(
+            category: _formListKey.currentState!._category!,
+            imagePath: _formListKey.currentState!.imagePath!,
+          );
+          final response = await _addItemHelper.postAddItem(request);
+          if (response != null) {
+            _formKey.currentState?.reset();
+            _formListKey.currentState!.imagePath = null;
+          }
+        } catch (e) {
+          print('Error adding the item ${e.toString()}');
+        }
       } else {
         _showOverlayError('Selecciona una imagen', context);
       }
