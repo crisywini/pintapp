@@ -135,18 +135,7 @@ class _CustomAddItemFormWidgetState extends State<_FormListViewWidget> {
       child: ListView(
         padding: EdgeInsets.all(16),
         children: [
-          TextFormField(
-            decoration: InputDecoration(
-              labelText: "Nombre",
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.bubble_chart),
-            ),
-            onChanged: (value) => _name = value,
-            validator: (value) {
-              if (value?.isEmpty ?? true) return 'Nombre es requerido';
-              return null;
-            },
-          ),
+          SelectImageWidget(onImageSelected: _onImageSelected),
           SizedBox(height: 16),
           DropdownButtonFormField(
             decoration: InputDecoration(
@@ -164,60 +153,6 @@ class _CustomAddItemFormWidgetState extends State<_FormListViewWidget> {
               return null;
             },
           ),
-          SizedBox(height: 16),
-          TextFormField(
-            decoration: InputDecoration(
-              labelText: "Color",
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.cookie),
-            ),
-            onChanged: (value) => _color = value,
-            validator: (value) {
-              if (value?.isEmpty ?? true) return "El color es requerido";
-              return null;
-            },
-          ),
-          SizedBox(height: 16),
-          TextFormField(
-            decoration: InputDecoration(
-              labelText: "Estilo",
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.shape_line),
-            ),
-            onChanged: (value) => _style = value,
-            validator: (value) {
-              if (value?.isEmpty ?? true) return "El estilo es requerido";
-              return null;
-            },
-          ),
-          SizedBox(height: 16),
-          TextFormField(
-            decoration: InputDecoration(
-              labelText: "Marca",
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.branding_watermark),
-            ),
-            onChanged: (value) => _brand = value,
-            validator: (value) {
-              if (value?.isEmpty ?? true) return "La marca es requerida";
-              return null;
-            },
-          ),
-          SizedBox(height: 16),
-          TextFormField(
-            decoration: InputDecoration(
-              labelText: "Temporada",
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.energy_savings_leaf_sharp),
-            ),
-            onChanged: (value) => _season = value,
-            validator: (value) {
-              if (value?.isEmpty ?? true) return "La temporada es requerida";
-              return null;
-            },
-          ),
-          SizedBox(height: 16),
-          SelectImageWidget(onImageSelected: _onImageSelected),
         ],
       ),
     );

@@ -50,7 +50,7 @@ class _SelectImageWidgetState extends State<SelectImageWidget> {
         );
       },
       child: Container(
-        height: 200,
+        height: 600,
         decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
         child: _imagePath == null
             ? Icon(Icons.add_a_photo)
