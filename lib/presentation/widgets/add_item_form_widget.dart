@@ -41,6 +41,7 @@ class _AddItemFormWidgetState extends State<AddItemFormWidget> {
             setState(() {
               _imagePath = null;
               _category = null;
+              _isLoading = false;
             });
           }
           _showOverlaySuccess('Item guardado correctamente', context);
