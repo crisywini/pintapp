@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pintapp/infrastructure/models/add_item_request.dart';
 import 'package:pintapp/presentation/widgets/button_gesture_detector_widget.dart';
 import 'package:pintapp/presentation/widgets/select_image_widget.dart';
 
@@ -9,18 +10,20 @@ class AddItemFormWidget extends StatelessWidget {
   AddItemFormWidget({super.key});
 
   void _saveForm(BuildContext context) {
-    print('=== DEBUG INFO ===');
-    print('FormListKey current state: ${_formListKey.currentState}');
-    print('Is mounted: ${_formListKey.currentState?.mounted}');
-    print('Image path value: "${_formListKey.currentState?.imagePath}"');
-    print('==================');
-
     bool isFormValid = _formKey.currentState?.validate() ?? false;
     bool hasImage = _formListKey.currentState?.imagePath != null;
-    print('Has Image $hasImage');
     if (isFormValid) {
       if (hasImage) {
-        print('Calling the backend');
+        var request = AddItemRequest(
+          name: _formListKey.currentState!._name!,
+          category: _formListKey.currentState!._category!,
+          color: _formListKey.currentState!._color!,
+          style: _formListKey.currentState!._style!,
+          brand: _formListKey.currentState!._brand!,
+          season: _formListKey.currentState!._season!,
+          imagePath: _formListKey.currentState!.imagePath!,
+        );
+
         _formKey.currentState?.reset();
         _formListKey.currentState!.imagePath = null;
       } else {
