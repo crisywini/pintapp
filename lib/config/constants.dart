@@ -1,5 +1,5 @@
 class APIConstants {
-  static const String baseUrl = "//192.168.20.15:5000/";
+  static const String baseUrl = "http://192.168.40.77:5000/";
   static const String itemServiceUrl = "items";
   static const String outfitsServiceUrl = "outfits";
   static const String categoriesServiceUrl = "categories/outfits";

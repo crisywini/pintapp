@@ -4,30 +4,49 @@ import 'package:pintapp/infrastructure/models/add_item_request.dart';
 import 'package:pintapp/presentation/widgets/button_gesture_detector_widget.dart';
 import 'package:pintapp/presentation/widgets/select_image_widget.dart';
 
-class AddItemFormWidget extends StatelessWidget {
+class AddItemFormWidget extends StatefulWidget {
+  AddItemFormWidget({super.key});
+  @override
+  State<StatefulWidget> createState() => _AddItemFormWidgetState();
+}
+
+class _AddItemFormWidgetState extends State<AddItemFormWidget> {
   final _formKey = GlobalKey<FormState>();
-  final _formListKey = GlobalKey<_CustomAddItemFormWidgetState>();
   final _addItemHelper = AddItemHelper();
 
-  AddItemFormWidget({super.key});
+  String? _category;
+  String? _imagePath;
+  bool _isLoading = false;
+
+  void _onImageSelected(String? imagePath) {
+    setState(() {
+      _imagePath = imagePath;
+      print('Image selected: $_imagePath');
+    });
+  }
 
   void _saveForm(BuildContext context) async {
     bool isFormValid = _formKey.currentState?.validate() ?? false;
-    bool hasImage = _formListKey.currentState?.imagePath != null;
+    bool hasImage = _imagePath != null && _imagePath!.isNotEmpty;
     if (isFormValid) {
       if (hasImage) {
         try {
           var request = AddItemRequest(
-            category: _formListKey.currentState!._category!,
-            imagePath: _formListKey.currentState!.imagePath!,
+            category: _category!,
+            imagePath: _imagePath!,
           );
           final response = await _addItemHelper.postAddItem(request);
           if (response != null) {
             _formKey.currentState?.reset();
-            _formListKey.currentState!.imagePath = null;
+            setState(() {
+              _imagePath = null;
+              _category = null;
+            });
           }
+          _showOverlaySuccess('Item guardado correctamente', context);
         } catch (e) {
           print('Error adding the item ${e.toString()}');
+          _showOverlayError('Error al guardar el item', context);
         }
       } else {
         _showOverlayError('Selecciona una imagen', context);
@@ -36,6 +55,19 @@ class AddItemFormWidget extends StatelessWidget {
   }
 
   void _showOverlayError(String message, BuildContext context) {
+    _showOverlay(message, context, Colors.red, Icons.error);
+  }
+
+  void _showOverlaySuccess(String message, BuildContext context) {
+    _showOverlay(message, context, Colors.green, Icons.check_circle);
+  }
+
+  void _showOverlay(
+    String message,
+    BuildContext context,
+    Color color,
+    IconData icon,
+  ) {
     OverlayEntry overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
         top: MediaQuery.of(context).padding.top + 20,
@@ -46,7 +78,7 @@ class AddItemFormWidget extends StatelessWidget {
           child: Container(
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.red,
+              color: color,
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
@@ -58,7 +90,7 @@ class AddItemFormWidget extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Icon(Icons.error, color: Colors.white),
+                Icon(icon, color: Colors.white),
                 SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -83,76 +115,44 @@ class AddItemFormWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final saveFormCustomButton = CustomButtonGestureDetector(
       imageUrl: "",
-      valueName: "Guardar",
+      valueName: _isLoading ? "Guardando..." : "Guardar",
       onPressed: () => _saveForm(context),
-      color: Colors.green,
+      color: _isLoading ? Colors.grey : Colors.green,
     );
 
     return Column(
       children: [
         Expanded(
-          child: _FormListViewWidget(key: _formListKey, formKey: _formKey),
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              padding: EdgeInsets.all(16),
+              children: [
+                SelectImageWidget(onImageSelected: _onImageSelected),
+                SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  decoration: InputDecoration(
+                    labelText: 'Categoría',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.category),
+                  ),
+                  value: _category,
+                  items: ['Superior', 'Inferior', 'Calzado']
+                      .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                      .toList(),
+                  onChanged: (value) => setState(() => _category = value),
+                  validator: (value) {
+                    if (value?.isEmpty ?? true)
+                      return "La categoría es requerida";
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
         ),
         Padding(padding: EdgeInsets.all(40), child: saveFormCustomButton),
       ],
-    );
-  }
-}
-
-class _FormListViewWidget extends StatefulWidget {
-  final GlobalKey<FormState> formKey;
-  final VoidCallback? onValidationRequired;
-
-  const _FormListViewWidget({
-    Key? key,
-    required this.formKey,
-    this.onValidationRequired,
-  });
-
-  @override
-  State<StatefulWidget> createState() => _CustomAddItemFormWidgetState();
-}
-
-class _CustomAddItemFormWidgetState extends State<_FormListViewWidget> {
-  String? _category;
-  String? imagePath;
-
-  void _onImageSelected(String? imagePath) {
-    setState(() {
-      this.imagePath = imagePath;
-      print('Imagen seleccionada');
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    const List<String> categoryElements = ['Superior', 'Inferior', 'Calzado'];
-
-    return Form(
-      key: widget.formKey,
-      child: ListView(
-        padding: EdgeInsets.all(16),
-        children: [
-          SelectImageWidget(onImageSelected: _onImageSelected),
-          SizedBox(height: 16),
-          DropdownButtonFormField(
-            decoration: InputDecoration(
-              labelText: 'Categoría',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.category),
-            ),
-            value: _category,
-            items: categoryElements
-                .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                .toList(),
-            onChanged: (value) => setState(() => _category = value),
-            validator: (value) {
-              if (value?.isEmpty ?? true) return "La categoría es requerida";
-              return null;
-            },
-          ),
-        ],
-      ),
     );
   }
 }
