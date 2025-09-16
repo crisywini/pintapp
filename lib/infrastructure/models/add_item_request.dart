@@ -1,21 +1,13 @@
 class AddItemRequest {
-  String name;
+  String? name;
   String category;
-  String color;
-  String style;
-  String brand;
-  String season;
+  String? color;
+  String? style;
+  String? brand;
+  String? season;
   String imagePath;
 
-  AddItemRequest({
-    required this.name,
-    required this.category,
-    required this.color,
-    required this.style,
-    required this.brand,
-    required this.season,
-    required this.imagePath,
-  });
+  AddItemRequest({required this.category, required this.imagePath});
 
   Map<String, dynamic> toJson() {
     return {

@@ -15,12 +15,7 @@ class AddItemFormWidget extends StatelessWidget {
     if (isFormValid) {
       if (hasImage) {
         var request = AddItemRequest(
-          name: _formListKey.currentState!._name!,
           category: _formListKey.currentState!._category!,
-          color: _formListKey.currentState!._color!,
-          style: _formListKey.currentState!._style!,
-          brand: _formListKey.currentState!._brand!,
-          season: _formListKey.currentState!._season!,
           imagePath: _formListKey.currentState!.imagePath!,
         );
 
@@ -111,12 +106,7 @@ class _FormListViewWidget extends StatefulWidget {
 }
 
 class _CustomAddItemFormWidgetState extends State<_FormListViewWidget> {
-  String? _name;
   String? _category;
-  String? _color;
-  String? _style;
-  String? _brand;
-  String? _season;
   String? imagePath;
 
   void _onImageSelected(String? imagePath) {
