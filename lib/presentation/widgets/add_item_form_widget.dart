@@ -5,7 +5,7 @@ import 'package:pintapp/presentation/widgets/button_gesture_detector_widget.dart
 import 'package:pintapp/presentation/widgets/select_image_widget.dart';
 
 class AddItemFormWidget extends StatefulWidget {
-  AddItemFormWidget({super.key});
+  const AddItemFormWidget({super.key});
   @override
   State<StatefulWidget> createState() => _AddItemFormWidgetState();
 }
@@ -13,6 +13,7 @@ class AddItemFormWidget extends StatefulWidget {
 class _AddItemFormWidgetState extends State<AddItemFormWidget> {
   final _formKey = GlobalKey<FormState>();
   final _addItemHelper = AddItemHelper();
+  final _selectImageKey = GlobalKey<SelectImageWidgetState>();
 
   String? _category;
   String? _imagePath;
@@ -38,6 +39,7 @@ class _AddItemFormWidgetState extends State<AddItemFormWidget> {
           final response = await _addItemHelper.postAddItem(request);
           if (response != null) {
             _formKey.currentState?.reset();
+            _selectImageKey.currentState?.resetImage();
             setState(() {
               _imagePath = null;
               _category = null;
@@ -129,7 +131,10 @@ class _AddItemFormWidgetState extends State<AddItemFormWidget> {
             child: ListView(
               padding: EdgeInsets.all(16),
               children: [
-                SelectImageWidget(onImageSelected: _onImageSelected),
+                SelectImageWidget(
+                  key: _selectImageKey,
+                  onImageSelected: _onImageSelected,
+                ),
                 SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   decoration: InputDecoration(
