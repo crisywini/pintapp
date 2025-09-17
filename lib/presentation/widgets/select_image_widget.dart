@@ -7,16 +7,22 @@ import 'package:image_picker/image_picker.dart';
 class SelectImageWidget extends StatefulWidget {
   final Function(String?) onImageSelected;
 
-  const SelectImageWidget({Key? key, required this.onImageSelected})
-    : super(key: key);
+  const SelectImageWidget({super.key, required this.onImageSelected});
 
   @override
-  State<StatefulWidget> createState() => _SelectImageWidgetState();
+  State<StatefulWidget> createState() => SelectImageWidgetState();
 }
 
-class _SelectImageWidgetState extends State<SelectImageWidget> {
+class SelectImageWidgetState extends State<SelectImageWidget> {
   String? _imagePath;
   final ImagePicker _picker = ImagePicker();
+
+  void resetImage() {
+    setState(() {
+      _imagePath = null;
+    });
+    widget.onImageSelected(null);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +56,7 @@ class _SelectImageWidgetState extends State<SelectImageWidget> {
         );
       },
       child: Container(
-        height: 200,
+        height: 600,
         decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
         child: _imagePath == null
             ? Icon(Icons.add_a_photo)
