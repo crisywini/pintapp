@@ -1,7 +1,4 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:pintapp/presentation/widgets/button_gesture_detector_widget.dart';
 
 class ScrollableItemWidget extends StatefulWidget {
   final List<String> imagePaths;
