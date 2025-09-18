@@ -148,8 +148,9 @@ class _AddItemFormWidgetState extends State<AddItemFormWidget> {
                       .toList(),
                   onChanged: (value) => setState(() => _category = value),
                   validator: (value) {
-                    if (value?.isEmpty ?? true)
+                    if (value?.isEmpty ?? true) {
                       return "La categoría es requerida";
+                    }
                     return null;
                   },
                 ),
