@@ -2,18 +2,31 @@ import 'package:flutter/material.dart';
 
 class ScrollableItemWidget extends StatefulWidget {
   final List<String> imagePaths;
+  final Function(int)? onImageChanged;
 
-  const ScrollableItemWidget({super.key, required this.imagePaths});
+  const ScrollableItemWidget({
+    super.key,
+    required this.imagePaths,
+    this.onImageChanged,
+  });
 
   @override
   State<StatefulWidget> createState() => _ScrollableItemWidgetState();
 }
 
 class _ScrollableItemWidgetState extends State<ScrollableItemWidget> {
+  int currentIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return PageView.builder(
       itemCount: widget.imagePaths.length,
+      onPageChanged: (index) {
+        setState(() {
+          currentIndex = index;
+        });
+        widget.onImageChanged?.call(index);
+      },
       itemBuilder: (context, index) {
         return SizedBox(
           width: double.infinity,

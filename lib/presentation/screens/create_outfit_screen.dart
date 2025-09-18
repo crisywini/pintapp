@@ -1,8 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:pintapp/presentation/widgets/outfit_builder_widget.dart';
 
-class CreateOutfitScreen extends StatelessWidget {
+class CreateOutfitScreen extends StatefulWidget {
   const CreateOutfitScreen({super.key});
+
+  @override
+  State<CreateOutfitScreen> createState() => _CreateOutfitScreenState();
+}
+
+class _CreateOutfitScreenState extends State<CreateOutfitScreen> {
+  bool isOutfitSaved = false;
+
+  void _handleOutfitCreation(Map<String, dynamic> outfitPayload) {
+    print('Outfit payload to send to backend:');
+    print(outfitPayload);
+
+    setState(() {
+      isOutfitSaved = true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,11 +46,7 @@ class CreateOutfitScreen extends StatelessWidget {
         topImages: topImages,
         pantsImages: pantsImages,
         shoeImages: shoeImages,
-        onCreateOutfit: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Outfit created!')),
-          );
-        },
+        onCreateOutfit: _handleOutfitCreation,
       ),
     );
   }
