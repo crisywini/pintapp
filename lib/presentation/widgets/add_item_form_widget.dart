@@ -19,6 +19,12 @@ class _AddItemFormWidgetState extends State<AddItemFormWidget> {
   String? _imagePath;
   bool _isLoading = false;
 
+  final Map<String, String> _categoryMapping = {
+    'Superior': 'shirts',
+    'Pantalones': 'pants',
+    'Zapatos': 'shoes',
+  };
+
   void _onImageSelected(String? imagePath) {
     setState(() {
       _imagePath = imagePath;
@@ -33,7 +39,7 @@ class _AddItemFormWidgetState extends State<AddItemFormWidget> {
       if (hasImage) {
         try {
           var request = AddItemRequest(
-            category: _category!,
+            category: _categoryMapping[_category!]!,
             imagePath: _imagePath!,
           );
           final response = await _addItemHelper.postAddItem(request);
@@ -143,7 +149,7 @@ class _AddItemFormWidgetState extends State<AddItemFormWidget> {
                     prefixIcon: Icon(Icons.category),
                   ),
                   value: _category,
-                  items: ['Superior', 'Inferior', 'Calzado']
+                  items: _categoryMapping.keys
                       .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                       .toList(),
                   onChanged: (value) => setState(() => _category = value),
