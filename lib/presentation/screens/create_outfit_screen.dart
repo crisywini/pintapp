@@ -87,7 +87,10 @@ class _CreateOutfitScreenState extends State<CreateOutfitScreen> {
     }
 
     // Show loading overlay
-    final loadingOverlay = OverlayUtils.showLoading("Guardando outfit...", context);
+    final loadingOverlay = OverlayUtils.showLoading(
+      "Guardando pinta...",
+      context,
+    );
 
     try {
       final topIndex = outfitPayload['top']['index'] as int;
@@ -111,8 +114,10 @@ class _CreateOutfitScreenState extends State<CreateOutfitScreen> {
 
       print('Outfit saved successfully: $result');
 
-      // Show success overlay
-      OverlayUtils.showSuccess("Outfit '$outfitName' guardado exitosamente", context);
+      OverlayUtils.showSuccess(
+        "Outfit '$outfitName' guardado exitosamente",
+        context,
+      );
 
       setState(() {
         isOutfitSaved = true;
@@ -122,8 +127,10 @@ class _CreateOutfitScreenState extends State<CreateOutfitScreen> {
       loadingOverlay.remove();
 
       print('Error saving outfit: $e');
-      // Show error overlay
-      OverlayUtils.showError('Error guardando outfit: ${e.toString()}', context);
+      OverlayUtils.showError(
+        'Error guardando outfit: ${e.toString()}',
+        context,
+      );
     }
   }
 
@@ -180,7 +187,6 @@ class _CreateOutfitScreenState extends State<CreateOutfitScreen> {
       },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
