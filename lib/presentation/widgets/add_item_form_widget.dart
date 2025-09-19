@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pintapp/config/helpers/add_item_helper.dart';
 import 'package:pintapp/infrastructure/models/add_item_request.dart';
 import 'package:pintapp/presentation/widgets/button_gesture_detector_widget.dart';
+import 'package:pintapp/presentation/widgets/overlay_utils.dart';
 import 'package:pintapp/presentation/widgets/select_image_widget.dart';
 
 class AddItemFormWidget extends StatefulWidget {
@@ -19,6 +20,12 @@ class _AddItemFormWidgetState extends State<AddItemFormWidget> {
   String? _imagePath;
   bool _isLoading = false;
 
+  final Map<String, String> _categoryMapping = {
+    'Superior': 'shirts',
+    'Pantalones': 'pants',
+    'Zapatos': 'shoes',
+  };
+
   void _onImageSelected(String? imagePath) {
     setState(() {
       _imagePath = imagePath;
@@ -33,7 +40,7 @@ class _AddItemFormWidgetState extends State<AddItemFormWidget> {
       if (hasImage) {
         try {
           var request = AddItemRequest(
-            category: _category!,
+            category: _categoryMapping[_category!]!,
             imagePath: _imagePath!,
           );
           final response = await _addItemHelper.postAddItem(request);
@@ -46,72 +53,15 @@ class _AddItemFormWidgetState extends State<AddItemFormWidget> {
               _isLoading = false;
             });
           }
-          _showOverlaySuccess('Item guardado correctamente', context);
+          OverlayUtils.showSuccess('Item guardado correctamente', context);
         } catch (e) {
           print('Error adding the item ${e.toString()}');
-          _showOverlayError('Error al guardar el item', context);
+          OverlayUtils.showError('Error al guardar el item', context);
         }
       } else {
-        _showOverlayError('Selecciona una imagen', context);
+        OverlayUtils.showError('Selecciona una imagen', context);
       }
     }
-  }
-
-  void _showOverlayError(String message, BuildContext context) {
-    _showOverlay(message, context, Colors.red, Icons.error);
-  }
-
-  void _showOverlaySuccess(String message, BuildContext context) {
-    _showOverlay(message, context, Colors.green, Icons.check_circle);
-  }
-
-  void _showOverlay(
-    String message,
-    BuildContext context,
-    Color color,
-    IconData icon,
-  ) {
-    OverlayEntry overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        top: MediaQuery.of(context).padding.top + 20,
-        left: 20,
-        right: 20,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 10,
-                  offset: Offset(0, 5),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Icon(icon, color: Colors.white),
-                SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    message,
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-    Overlay.of(context).insert(overlayEntry);
-
-    Future.delayed(Duration(seconds: 3), () {
-      overlayEntry.remove();
-    });
   }
 
   @override
@@ -143,13 +93,14 @@ class _AddItemFormWidgetState extends State<AddItemFormWidget> {
                     prefixIcon: Icon(Icons.category),
                   ),
                   value: _category,
-                  items: ['Superior', 'Inferior', 'Calzado']
+                  items: _categoryMapping.keys
                       .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                       .toList(),
                   onChanged: (value) => setState(() => _category = value),
                   validator: (value) {
-                    if (value?.isEmpty ?? true)
+                    if (value?.isEmpty ?? true) {
                       return "La categoría es requerida";
+                    }
                     return null;
                   },
                 ),

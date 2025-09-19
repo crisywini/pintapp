@@ -2,7 +2,7 @@ class APIConstants {
   static const String baseUrl = "http://192.168.40.77:5000/";
   static const String itemServiceUrl = "items";
   static const String outfitsServiceUrl = "outfits";
-  static const String categoriesServiceUrl = "categories/outfits";
+  static const String itemsCategoryServiceUrl = "$itemServiceUrl?category=";
 }
 
 enum Environment { dev, staging, prod }
