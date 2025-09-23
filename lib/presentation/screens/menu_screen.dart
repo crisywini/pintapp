@@ -20,7 +20,7 @@ class MenuScreen extends StatelessWidget {
     final seeOutfits = _CustomGestureDetector(
       imageUrl: "",
       valueName: 'Ver las pintas',
-      onPressed: () => print('Ver las pintas'),
+      onPressed: () => Navigator.pushNamed(context, '/outfits-grid'),
       color: Colors.orange,
     );
 

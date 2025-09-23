@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pintapp/presentation/screens/add_item_screen.dart';
 import 'package:pintapp/presentation/screens/create_outfit_screen.dart';
+import 'package:pintapp/presentation/screens/see_outfits_screen.dart';
 import 'package:pintapp/presentation/screens/menu_screen.dart';
 
 void main() => runApp(App());
@@ -14,6 +15,7 @@ class App extends StatelessWidget {
       routes: {
         '/add-item': (context) => AddItemScreen(),
         '/create-outfit': (context) => CreateOutfitScreen(),
+        '/outfits-grid': (context) => SeeOutfitsScreen(),
       },
 
       debugShowCheckedModeBanner: false,
