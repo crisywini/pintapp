@@ -4,29 +4,28 @@ import 'package:pintapp/presentation/widgets/full_screen_image_view.dart';
 class OutfitGridWidget extends StatelessWidget {
   final List<Map<String, dynamic>> outfits;
 
-  const OutfitGridWidget({
-    super.key,
-    required this.outfits,
-  });
+  const OutfitGridWidget({super.key, required this.outfits});
 
   int _getCrossAxisCount(BuildContext context) {
     final orientation = MediaQuery.of(context).orientation;
     final width = MediaQuery.of(context).size.width;
 
     if (orientation == Orientation.landscape) {
-      return width > 1200 ? 4 : 3;
+      return width > 1200 ? 3 : 2;
     } else {
-      return width > 600 ? 3 : 2;
+      return width > 600 ? 2 : 2;
     }
   }
 
-  void _openFullScreenImage(BuildContext context, String imageUrl, String outfitName) {
+  void _openFullScreenImage(
+    BuildContext context,
+    String imageUrl,
+    String outfitName,
+  ) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => FullScreenImageView(
-          imageUrl: imageUrl,
-          title: outfitName,
-        ),
+        builder: (context) =>
+            FullScreenImageView(imageUrl: imageUrl, title: outfitName),
       ),
     );
   }
@@ -38,11 +37,7 @@ class OutfitGridWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.checkroom,
-              size: 64,
-              color: Colors.grey,
-            ),
+            Icon(Icons.checkroom, size: 64, color: Colors.grey),
             SizedBox(height: 16),
             Text(
               'No hay outfits disponibles',
@@ -64,7 +59,7 @@ class OutfitGridWidget extends StatelessWidget {
           crossAxisCount: _getCrossAxisCount(context),
           crossAxisSpacing: 8.0,
           mainAxisSpacing: 8.0,
-          childAspectRatio: 0.75,
+          childAspectRatio: 0.4,
         ),
         itemCount: outfits.length,
         itemBuilder: (context, index) {
@@ -85,17 +80,19 @@ class OutfitGridWidget extends StatelessWidget {
                 children: [
                   Expanded(
                     child: ClipRRect(
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(12),
+                      ),
                       child: Image.network(
                         imageUrl,
-                        fit: BoxFit.cover,
+                        fit: BoxFit.contain,
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return Center(
                             child: CircularProgressIndicator(
                               value: loadingProgress.expectedTotalBytes != null
                                   ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
+                                        loadingProgress.expectedTotalBytes!
                                   : null,
                             ),
                           );
@@ -127,7 +124,7 @@ class OutfitGridWidget extends StatelessWidget {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: EdgeInsets.all(6.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -135,25 +132,29 @@ class OutfitGridWidget extends StatelessWidget {
                           name,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontSize: 12,
                             fontFamily: "Bebas Neue",
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         if (category.isNotEmpty) ...[
-                          SizedBox(height: 4),
+                          SizedBox(height: 2),
                           Container(
-                            padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 4,
+                              vertical: 1,
+                            ),
                             decoration: BoxDecoration(
-                              color: Colors.orange.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.grey[200],
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.black, width: 0.5),
                             ),
                             child: Text(
                               category,
                               style: TextStyle(
-                                fontSize: 10,
-                                color: Colors.orange[800],
+                                fontSize: 9,
+                                color: Colors.black,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pintapp/presentation/widgets/outfit_grid_widget.dart';
+import 'package:pintapp/config/helpers/get_all_outfits_helper.dart';
+import 'package:pintapp/config/constants.dart';
 
 class SeeOutfitsScreen extends StatefulWidget {
   const SeeOutfitsScreen({super.key});
@@ -12,6 +14,7 @@ class _SeeOutfitsScreenState extends State<SeeOutfitsScreen> {
   String? selectedCategory;
   bool isLoading = true;
   List<Map<String, dynamic>> outfits = [];
+  final GetAllOutfitsHelper _outfitsHelper = GetAllOutfitsHelper();
 
   final List<String> categories = ['All', 'Casual', 'Formal', 'Sport', 'Party'];
 
@@ -26,51 +29,72 @@ class _SeeOutfitsScreenState extends State<SeeOutfitsScreen> {
       isLoading = true;
     });
 
-    await Future.delayed(Duration(milliseconds: 500));
+    try {
+      dynamic response;
+      if (selectedCategory == null || selectedCategory == 'All') {
+        response = await _outfitsHelper.getAllOutfits();
+      } else {
+        response = await _outfitsHelper.getAllOutfitsByCategory(selectedCategory!);
+      }
 
-    final mockOutfits = [
-      {
-        'id': '1',
-        'name': 'Casual Look',
-        'category': 'Casual',
-        'image_url': 'https://picsum.photos/300/400?random=1',
-      },
-      {
-        'id': '2',
-        'name': 'Formal Attire',
-        'category': 'Formal',
-        'image_url': 'https://picsum.photos/300/400?random=2',
-      },
-      {
-        'id': '3',
-        'name': 'Sport Outfit',
-        'category': 'Sport',
-        'image_url': 'https://picsum.photos/300/400?random=3',
-      },
-      {
-        'id': '4',
-        'name': 'Party Style',
-        'category': 'Party',
-        'image_url': 'https://picsum.photos/300/400?random=4',
-      },
-      {
-        'id': '5',
-        'name': 'Weekend Casual',
-        'category': 'Casual',
-        'image_url': 'https://picsum.photos/300/400?random=5',
-      },
-      {
-        'id': '6',
-        'name': 'Business Formal',
-        'category': 'Formal',
-        'image_url': 'https://picsum.photos/300/400?random=6',
-      },
-    ];
+      final List<Map<String, dynamic>> loadedOutfits = _extractOutfits(response);
 
-    setState(() {
-      outfits = mockOutfits;
-      isLoading = false;
-    });
+      setState(() {
+        outfits = loadedOutfits;
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error loading outfits: $e');
+      setState(() {
+        outfits = [];
+        isLoading = false;
+      });
+    }
+  }
+
+  List<Map<String, dynamic>> _extractOutfits(dynamic response) {
+    if (response is Map<String, dynamic> && response['success'] == false) {
+      return [];
+    }
+
+    if (response is List) {
+      return response.map((outfit) => _transformOutfit(outfit)).toList();
+    }
+
+    if (response is Map<String, dynamic> &&
+        response.containsKey('outfits') &&
+        response['outfits'] is List) {
+      return List<Map<String, dynamic>>.from(
+          response['outfits'].map((outfit) => _transformOutfit(outfit)));
+    }
+
+    return [];
+  }
+
+  Map<String, dynamic> _transformOutfit(dynamic outfit) {
+    if (outfit is Map<String, dynamic>) {
+      final String imageUrl = outfit['default_image_url'] ?? outfit['default_image'] ?? '';
+      final String fullImageUrl = imageUrl.startsWith('images/')
+          ? '${APIConstants.baseUrl}$imageUrl'
+          : imageUrl;
+
+      return {
+        'id': outfit['id']?.toString() ?? '',
+        'name': outfit['name'] ?? 'Outfit',
+        'category': outfit['category'] ?? '',
+        'image_url': fullImageUrl,
+        'items': outfit['items'] ?? [],
+        'pictures_urls': outfit['pictures_urls'] ?? [],
+      };
+    }
+    return {
+      'id': '',
+      'name': 'Outfit',
+      'category': '',
+      'image_url': '',
+      'items': [],
+      'pictures_urls': [],
+    };
   }
 
   List<Map<String, dynamic>> get filteredOutfits {
@@ -85,7 +109,11 @@ class _SeeOutfitsScreenState extends State<SeeOutfitsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Ver las Pintas')),
+      appBar: AppBar(
+        title: Text('Ver las Pintas'),
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+      ),
       body: Column(
         children: [
           Container(
@@ -103,7 +131,12 @@ class _SeeOutfitsScreenState extends State<SeeOutfitsScreen> {
                 return Padding(
                   padding: EdgeInsets.only(right: 8),
                   child: FilterChip(
-                    label: Text(category),
+                    label: Text(
+                      category,
+                      style: TextStyle(
+                        color: isSelected ? Colors.white : Colors.black,
+                      ),
+                    ),
                     selected: isSelected,
                     onSelected: (selected) {
                       setState(() {
@@ -111,9 +144,12 @@ class _SeeOutfitsScreenState extends State<SeeOutfitsScreen> {
                             ? (category == 'All' ? null : category)
                             : null;
                       });
+                      _loadOutfits();
                     },
-                    selectedColor: Colors.orange.withOpacity(0.3),
-                    checkmarkColor: Colors.orange,
+                    selectedColor: Colors.black,
+                    backgroundColor: Colors.white,
+                    checkmarkColor: Colors.white,
+                    side: BorderSide(color: Colors.black, width: 1),
                   ),
                 );
               },
