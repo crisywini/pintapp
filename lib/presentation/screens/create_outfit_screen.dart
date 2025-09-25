@@ -86,12 +86,6 @@ class _CreateOutfitScreenState extends State<CreateOutfitScreen> {
       return;
     }
 
-    // Show loading overlay
-    final loadingOverlay = OverlayUtils.showLoading(
-      "Guardando pinta...",
-      context,
-    );
-
     try {
       final topIndex = outfitPayload['top']['index'] as int;
       final pantsIndex = outfitPayload['pants']['index'] as int;
@@ -109,9 +103,6 @@ class _CreateOutfitScreenState extends State<CreateOutfitScreen> {
         items: selectedItems,
       );
 
-      // Remove loading overlay
-      loadingOverlay.remove();
-
       print('Outfit saved successfully: $result');
 
       OverlayUtils.showSuccess(
@@ -123,9 +114,6 @@ class _CreateOutfitScreenState extends State<CreateOutfitScreen> {
         isOutfitSaved = true;
       });
     } catch (e) {
-      // Remove loading overlay
-      loadingOverlay.remove();
-
       print('Error saving outfit: $e');
       OverlayUtils.showError(
         'Error guardando outfit: ${e.toString()}',
