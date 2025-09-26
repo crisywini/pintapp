@@ -15,7 +15,7 @@ class _SeeOutfitsScreenState extends State<SeeOutfitsScreen> {
   List<Map<String, dynamic>> outfits = [];
   final LocalGetAllOutfitsHelper _outfitsHelper = LocalGetAllOutfitsHelper();
 
-  final List<String> categories = ['All', 'Casual', 'Formal', 'Sport', 'Party'];
+  final List<String> categories = ['All', 'Casual', 'Formal', 'Sport', 'Gym'];
 
   @override
   void initState() {

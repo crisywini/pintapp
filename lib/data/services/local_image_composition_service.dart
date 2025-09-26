@@ -26,17 +26,27 @@ class LocalImageCompositionService implements ImageCompositionService {
 
     for (final item in items) {
       final file = File(item.imagePath);
+      print('Checking image file: ${item.imagePath}');
       if (await file.exists()) {
-        final bytes = await file.readAsBytes();
-        final image = img.decodeImage(bytes);
-        if (image != null) {
-          images.add(image);
+        try {
+          final bytes = await file.readAsBytes();
+          final image = img.decodeImage(bytes);
+          if (image != null) {
+            images.add(image);
+            print('Successfully loaded image: ${item.imagePath}');
+          } else {
+            print('Failed to decode image: ${item.imagePath}');
+          }
+        } catch (e) {
+          print('Error reading image file ${item.imagePath}: $e');
         }
+      } else {
+        print('Image file does not exist: ${item.imagePath}');
       }
     }
 
     if (images.isEmpty) {
-      throw StateError('No valid images found for outfit composition');
+      throw StateError('No valid images found for outfit composition. Checked ${items.length} items.');
     }
 
     final compositeImage = _createComposition(images, outfitName);

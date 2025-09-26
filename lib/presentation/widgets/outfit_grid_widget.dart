@@ -31,6 +31,72 @@ class OutfitGridWidget extends StatelessWidget {
     );
   }
 
+  Widget _buildOutfitImage(Map<String, dynamic> outfit) {
+    final imageUrl = outfit['image_url'] ?? '';
+    final items = outfit['items'] as List<dynamic>? ?? [];
+
+    // Try to show composite image first
+    if (imageUrl.isNotEmpty) {
+      return Image.file(
+        File(imageUrl),
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) {
+          // If composite image fails, try to show first item image
+          return _buildFallbackImage(items);
+        },
+      );
+    }
+
+    // If no composite image, show fallback
+    return _buildFallbackImage(items);
+  }
+
+  Widget _buildFallbackImage(List<dynamic> items) {
+    // Try to find the first item with a valid image path
+    for (final item in items) {
+      if (item is Map<String, dynamic>) {
+        final itemImagePath = item['imagePath'] ?? item['image_url'] ?? '';
+        if (itemImagePath.isNotEmpty) {
+          return Image.file(
+            File(itemImagePath),
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) {
+              return _buildPlaceholderImage();
+            },
+          );
+        }
+      }
+    }
+
+    // If no valid images found, show placeholder
+    return _buildPlaceholderImage();
+  }
+
+  Widget _buildPlaceholderImage() {
+    return Container(
+      color: Colors.grey[200],
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.checkroom,
+            size: 48,
+            color: Colors.grey,
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Imagen no disponible',
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 12,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (outfits.isEmpty) {
@@ -84,33 +150,7 @@ class OutfitGridWidget extends StatelessWidget {
                       borderRadius: BorderRadius.vertical(
                         top: Radius.circular(12),
                       ),
-                      child: Image.file(
-                        File(imageUrl),
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: Colors.grey[200],
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.broken_image,
-                                  size: 48,
-                                  color: Colors.grey,
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  'Error al cargar imagen',
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
+                      child: _buildOutfitImage(outfit),
                     ),
                   ),
                   Padding(
