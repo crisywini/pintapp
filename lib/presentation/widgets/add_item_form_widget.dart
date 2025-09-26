@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pintapp/config/helpers/add_item_helper.dart';
+import 'package:pintapp/config/helpers/local_add_item_helper.dart';
 import 'package:pintapp/infrastructure/models/add_item_request.dart';
 import 'package:pintapp/presentation/widgets/button_gesture_detector_widget.dart';
 import 'package:pintapp/presentation/widgets/overlay_utils.dart';
@@ -13,7 +13,7 @@ class AddItemFormWidget extends StatefulWidget {
 
 class _AddItemFormWidgetState extends State<AddItemFormWidget> {
   final _formKey = GlobalKey<FormState>();
-  final _addItemHelper = AddItemHelper();
+  final _addItemHelper = LocalAddItemHelper();
   final _selectImageKey = GlobalKey<SelectImageWidgetState>();
 
   String? _category;
