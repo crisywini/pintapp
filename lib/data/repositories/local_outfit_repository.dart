@@ -28,10 +28,16 @@ class LocalOutfitRepository implements OutfitRepository {
 
     String? compositeImagePath;
     if (outfit.items.isNotEmpty) {
-      compositeImagePath = await _imageCompositionService.createOutfitComposition(
-        outfit.items,
-        outfit.name,
-      );
+      try {
+        compositeImagePath = await _imageCompositionService.createOutfitComposition(
+          outfit.items,
+          outfit.name,
+        );
+      } catch (e) {
+        print('Warning: Failed to create composite image for outfit "${outfit.name}": $e');
+        // Continue without composite image - outfit can still be saved
+        compositeImagePath = null;
+      }
     }
 
     final outfitToSave = Outfit(

@@ -76,9 +76,9 @@ class _CreateOutfitScreenState extends State<CreateOutfitScreen> {
   }
 
   Future<void> _handleOutfitCreation(Map<String, dynamic> outfitPayload) async {
-    final outfitName = await _showOutfitNameDialog();
+    final outfitData = await _showOutfitNameDialog();
 
-    if (outfitName == null || outfitName.trim().isEmpty) {
+    if (outfitData == null || outfitData['name'] == null || outfitData['name'].trim().isEmpty) {
       return;
     }
 
@@ -94,15 +94,15 @@ class _CreateOutfitScreenState extends State<CreateOutfitScreen> {
       ];
 
       final result = await _outfitHelper.postAddOutfit(
-        name: outfitName.trim(),
-        category: 'casual',
+        name: outfitData['name'].trim(),
+        category: outfitData['category'],
         items: selectedItems,
       );
 
       print('Outfit saved successfully: $result');
 
       OverlayUtils.showSuccess(
-        "Outfit '$outfitName' guardado exitosamente",
+        "Outfit '${outfitData['name']}' guardado exitosamente",
         context,
       );
 
@@ -118,55 +118,86 @@ class _CreateOutfitScreenState extends State<CreateOutfitScreen> {
     }
   }
 
-  Future<String?> _showOutfitNameDialog() async {
+  Future<Map<String, dynamic>?> _showOutfitNameDialog() async {
     final TextEditingController nameController = TextEditingController();
+    final List<String> categories = ['Casual', 'Formal', 'Sport', 'Gym'];
+    String selectedCategory = categories[0];
 
-    return showDialog<String>(
+    return showDialog<Map<String, dynamic>>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Nombre del Outfit'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: InputDecoration(
-                  hintText: 'Ingresa el nombre del outfit',
-                  border: OutlineInputBorder(),
-                ),
-                autofocus: true,
-              ),
-              SizedBox(height: 20),
-              Row(
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('Crear Outfit'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: CustomButtonGestureDetector(
-                      imageUrl: "",
-                      valueName: "Cancelar",
-                      onPressed: () => Navigator.of(context).pop(null),
-                      color: const Color.fromARGB(255, 144, 39, 32),
+                  TextField(
+                    controller: nameController,
+                    decoration: InputDecoration(
+                      labelText: 'Nombre del Outfit',
+                      hintText: 'Ingresa el nombre del outfit',
+                      border: OutlineInputBorder(),
                     ),
+                    autofocus: true,
                   ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: CustomButtonGestureDetector(
-                      imageUrl: "",
-                      valueName: "Guardar",
-                      onPressed: () {
-                        final name = nameController.text.trim();
-                        if (name.isNotEmpty) {
-                          Navigator.of(context).pop(name);
-                        }
-                      },
-                      color: Colors.green,
+                  SizedBox(height: 20),
+                  DropdownButtonFormField<String>(
+                    value: selectedCategory,
+                    decoration: InputDecoration(
+                      labelText: 'Categoría',
+                      border: OutlineInputBorder(),
                     ),
+                    items: categories.map((String category) {
+                      return DropdownMenuItem<String>(
+                        value: category,
+                        child: Text(category),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      if (newValue != null) {
+                        setState(() {
+                          selectedCategory = newValue;
+                        });
+                      }
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: CustomButtonGestureDetector(
+                          imageUrl: "",
+                          valueName: "Cancelar",
+                          onPressed: () => Navigator.of(context).pop(null),
+                          color: const Color.fromARGB(255, 144, 39, 32),
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: CustomButtonGestureDetector(
+                          imageUrl: "",
+                          valueName: "Guardar",
+                          onPressed: () {
+                            final name = nameController.text.trim();
+                            if (name.isNotEmpty) {
+                              Navigator.of(context).pop({
+                                'name': name,
+                                'category': selectedCategory.toLowerCase(),
+                              });
+                            }
+                          },
+                          color: Colors.green,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
