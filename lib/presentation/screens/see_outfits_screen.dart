@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pintapp/presentation/widgets/outfit_grid_widget.dart';
-import 'package:pintapp/config/helpers/get_all_outfits_helper.dart';
-import 'package:pintapp/config/constants.dart';
+import 'package:pintapp/config/helpers/local_get_all_outfits_helper.dart';
 
 class SeeOutfitsScreen extends StatefulWidget {
   const SeeOutfitsScreen({super.key});
@@ -14,7 +13,7 @@ class _SeeOutfitsScreenState extends State<SeeOutfitsScreen> {
   String? selectedCategory;
   bool isLoading = true;
   List<Map<String, dynamic>> outfits = [];
-  final GetAllOutfitsHelper _outfitsHelper = GetAllOutfitsHelper();
+  final LocalGetAllOutfitsHelper _outfitsHelper = LocalGetAllOutfitsHelper();
 
   final List<String> categories = ['All', 'Casual', 'Formal', 'Sport', 'Party'];
 
@@ -31,11 +30,7 @@ class _SeeOutfitsScreenState extends State<SeeOutfitsScreen> {
 
     try {
       dynamic response;
-      if (selectedCategory == null || selectedCategory == 'All') {
-        response = await _outfitsHelper.getAllOutfits();
-      } else {
-        response = await _outfitsHelper.getAllOutfitsByCategory(selectedCategory!);
-      }
+      response = await _outfitsHelper.getAllOutfits();
 
       final List<Map<String, dynamic>> loadedOutfits = _extractOutfits(response);
 
@@ -73,16 +68,13 @@ class _SeeOutfitsScreenState extends State<SeeOutfitsScreen> {
 
   Map<String, dynamic> _transformOutfit(dynamic outfit) {
     if (outfit is Map<String, dynamic>) {
-      final String imageUrl = outfit['default_image_url'] ?? outfit['default_image'] ?? '';
-      final String fullImageUrl = imageUrl.startsWith('images/')
-          ? '${APIConstants.baseUrl}$imageUrl'
-          : imageUrl;
+      final String imageUrl = outfit['image_url'] ?? outfit['default_image_url'] ?? outfit['default_image'] ?? '';
 
       return {
         'id': outfit['id']?.toString() ?? '',
         'name': outfit['name'] ?? 'Outfit',
         'category': outfit['category'] ?? '',
-        'image_url': fullImageUrl,
+        'image_url': imageUrl,
         'items': outfit['items'] ?? [],
         'pictures_urls': outfit['pictures_urls'] ?? [],
       };

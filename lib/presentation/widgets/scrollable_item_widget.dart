@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 
 class ScrollableItemWidget extends StatefulWidget {
@@ -31,8 +32,8 @@ class _ScrollableItemWidgetState extends State<ScrollableItemWidget> {
         return SizedBox(
           width: double.infinity,
           height: double.infinity,
-          child: Image.network(
-            widget.imagePaths[index],
+          child: Image.file(
+            File(widget.imagePaths[index]),
             fit: BoxFit.contain,
             errorBuilder: (context, error, stackTrace) {
               return Center(

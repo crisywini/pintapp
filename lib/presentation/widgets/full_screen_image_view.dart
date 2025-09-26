@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 
 class FullScreenImageView extends StatelessWidget {
@@ -40,35 +41,9 @@ class FullScreenImageView extends StatelessWidget {
             minScale: 0.5,
             maxScale: 4.0,
             child: Center(
-              child: Image.network(
-                imageUrl,
+              child: Image.file(
+                File(imageUrl),
                 fit: BoxFit.contain,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircularProgressIndicator(
-                          color: Colors.white,
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!
-                              : null,
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          'Cargando imagen...',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontFamily: "Bebas Neue",
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
                 errorBuilder: (context, error, stackTrace) {
                   return Center(
                     child: Column(

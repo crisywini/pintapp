@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:pintapp/presentation/widgets/outfit_builder_widget.dart';
 import 'package:pintapp/presentation/widgets/button_gesture_detector_widget.dart';
 import 'package:pintapp/presentation/widgets/overlay_utils.dart';
-import 'package:pintapp/config/helpers/get_items_helper.dart';
-import 'package:pintapp/config/helpers/add_outfit_helper.dart';
-import 'package:pintapp/config/constants.dart';
+import 'package:pintapp/config/helpers/local_get_items_helper.dart';
+import 'package:pintapp/config/helpers/local_add_outfit_helper.dart';
 
 class CreateOutfitScreen extends StatefulWidget {
   const CreateOutfitScreen({super.key});
@@ -16,8 +15,8 @@ class CreateOutfitScreen extends StatefulWidget {
 class _CreateOutfitScreenState extends State<CreateOutfitScreen> {
   bool isOutfitSaved = false;
   bool isLoading = true;
-  final GetItemsHelper _itemsHelper = GetItemsHelper();
-  final AddOutfitHelper _outfitHelper = AddOutfitHelper();
+  final LocalGetItemsHelper _itemsHelper = LocalGetItemsHelper();
+  final LocalAddOutfitHelper _outfitHelper = LocalAddOutfitHelper();
 
   List<Map<String, dynamic>> topItems = [];
   List<Map<String, dynamic>> pantsItems = [];
@@ -71,11 +70,8 @@ class _CreateOutfitScreenState extends State<CreateOutfitScreen> {
 
   List<String> _extractImageUrls(List<Map<String, dynamic>> items) {
     return items.map((item) {
-      final imageUrl = item['image_url'] as String? ?? '';
-      if (imageUrl.startsWith('images/')) {
-        return '${APIConstants.baseUrl}$imageUrl';
-      }
-      return imageUrl;
+      final imagePath = item['imagePath'] as String? ?? item['image_url'] as String? ?? '';
+      return imagePath;
     }).toList();
   }
 

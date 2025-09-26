@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:pintapp/presentation/widgets/full_screen_image_view.dart';
 
@@ -83,20 +84,9 @@ class OutfitGridWidget extends StatelessWidget {
                       borderRadius: BorderRadius.vertical(
                         top: Radius.circular(12),
                       ),
-                      child: Image.network(
-                        imageUrl,
+                      child: Image.file(
+                        File(imageUrl),
                         fit: BoxFit.contain,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Center(
-                            child: CircularProgressIndicator(
-                              value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes!
-                                  : null,
-                            ),
-                          );
-                        },
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             color: Colors.grey[200],
@@ -148,7 +138,10 @@ class OutfitGridWidget extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: Colors.grey[200],
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.black, width: 0.5),
+                              border: Border.all(
+                                color: Colors.black,
+                                width: 0.5,
+                              ),
                             ),
                             child: Text(
                               category,
