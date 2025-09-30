@@ -22,7 +22,7 @@ class LocalImageCompositionService implements ImageCompositionService {
       throw ArgumentError('Cannot create outfit composition from empty items list');
     }
 
-    final images = <img.Image>[];
+    final itemsWithImages = <(Item, img.Image)>[];
 
     for (final item in items) {
       final file = File(item.imagePath);
@@ -32,7 +32,7 @@ class LocalImageCompositionService implements ImageCompositionService {
           final bytes = await file.readAsBytes();
           final image = img.decodeImage(bytes);
           if (image != null) {
-            images.add(image);
+            itemsWithImages.add((item, image));
             print('Successfully loaded image: ${item.imagePath}');
           } else {
             print('Failed to decode image: ${item.imagePath}');
@@ -45,11 +45,11 @@ class LocalImageCompositionService implements ImageCompositionService {
       }
     }
 
-    if (images.isEmpty) {
+    if (itemsWithImages.isEmpty) {
       throw StateError('No valid images found for outfit composition. Checked ${items.length} items.');
     }
 
-    final compositeImage = _createComposition(images, outfitName);
+    final compositeImage = _createComposition(itemsWithImages, outfitName);
 
     final fileName = '${_uuid.v4()}_outfit_${DateTime.now().millisecondsSinceEpoch}.png';
 
@@ -62,24 +62,65 @@ class LocalImageCompositionService implements ImageCompositionService {
     return outputPath;
   }
 
-  img.Image _createComposition(List<img.Image> images, String outfitName) {
-    final width = images.map((img) => img.width).reduce((a, b) => a > b ? a : b);
-    final height = images.map((img) => img.height).reduce((a, b) => a + b);
+  img.Image _createComposition(List<(Item, img.Image)> itemsWithImages, String outfitName) {
+    // Sort items in order: shirts, pants, shoes for proper layering
+    final sortedItems = List<(Item, img.Image)>.from(itemsWithImages);
+    sortedItems.sort((a, b) {
+      final categoryOrder = {'shirts': 0, 'pants': 1, 'shoes': 2};
+      final aOrder = categoryOrder[a.$1.category] ?? 3;
+      final bOrder = categoryOrder[b.$1.category] ?? 3;
+      return aOrder.compareTo(bOrder);
+    });
 
+    // Define scale factors for different categories
+    final scaleFactors = {
+      'shirts': 1.2,    // Make shirts bigger
+      'pants': 1.3,     // Make pants bigger
+      'shoes': 0.7,     // Make shoes smaller
+    };
+
+    // Calculate scaled dimensions
+    final scaledImages = <img.Image>[];
+    int maxWidth = 0;
+    int totalHeight = 0;
+
+    for (final (item, image) in sortedItems) {
+      final scaleFactor = scaleFactors[item.category] ?? 1.0;
+      final scaledWidth = (image.width * scaleFactor).round();
+      final scaledHeight = (image.height * scaleFactor).round();
+
+      final scaledImage = img.copyResize(
+        image,
+        width: scaledWidth,
+        height: scaledHeight,
+        interpolation: img.Interpolation.linear,
+      );
+
+      scaledImages.add(scaledImage);
+      maxWidth = maxWidth > scaledWidth ? maxWidth : scaledWidth;
+      totalHeight += scaledHeight;
+    }
+
+    // Create composite image
     final composite = img.Image(
-      width: width,
-      height: height,
+      width: maxWidth,
+      height: totalHeight,
     );
 
+    // Fill with white background
+    img.fill(composite, color: img.ColorRgb8(255, 255, 255));
+
+    // Composite scaled images vertically, centered horizontally
     int yOffset = 0;
-    for (final image in images) {
+    for (final scaledImage in scaledImages) {
+      final xOffset = (maxWidth - scaledImage.width) ~/ 2; // Center horizontally
       img.compositeImage(
         composite,
-        image,
-        dstX: 0,
+        scaledImage,
+        dstX: xOffset,
         dstY: yOffset,
       );
-      yOffset += image.height;
+      yOffset += scaledImage.height;
     }
 
     return composite;
