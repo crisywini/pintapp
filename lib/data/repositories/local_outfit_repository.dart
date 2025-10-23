@@ -55,11 +55,33 @@ class LocalOutfitRepository implements OutfitRepository {
 
   @override
   Future<void> deleteOutfit(String id) async {
+    // Get the outfit to delete
     final outfit = await getOutfitById(id);
-    if (outfit != null && outfit.compositeImagePath != null) {
-      await _storageService.deleteImage(outfit.compositeImagePath!);
-      await _databaseHelper.deleteOutfit(id);
+    if (outfit == null) {
+      throw Exception('Outfit with id $id not found');
     }
+
+    print('Deleting outfit: ${outfit.name} (id: $id)');
+
+    // Delete the composite image if it exists
+    if (outfit.compositeImagePath != null && outfit.compositeImagePath!.isNotEmpty) {
+      try {
+        final imageExists = await _storageService.imageExists(outfit.compositeImagePath!);
+        if (imageExists) {
+          await _storageService.deleteImage(outfit.compositeImagePath!);
+          print('Deleted composite image: ${outfit.compositeImagePath}');
+        } else {
+          print('Composite image not found: ${outfit.compositeImagePath}');
+        }
+      } catch (e) {
+        print('Warning: Failed to delete composite image: $e');
+        // Continue with deletion even if image deletion fails
+      }
+    }
+
+    // Delete from database (this also deletes outfit_items relationships via transaction)
+    await _databaseHelper.deleteOutfit(id);
+    print('Deleted outfit from database: $id');
   }
 
   @override

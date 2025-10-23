@@ -1,11 +1,17 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:pintapp/presentation/widgets/full_screen_image_view.dart';
+import 'package:pintapp/presentation/widgets/outfit_preview_modal.dart';
 
 class OutfitGridWidget extends StatelessWidget {
   final List<Map<String, dynamic>> outfits;
+  final Function(String)? onDeleteOutfit;
 
-  const OutfitGridWidget({super.key, required this.outfits});
+  const OutfitGridWidget({
+    super.key,
+    required this.outfits,
+    this.onDeleteOutfit,
+  });
 
   int _getCrossAxisCount(BuildContext context) {
     final orientation = MediaQuery.of(context).orientation;
@@ -28,6 +34,38 @@ class OutfitGridWidget extends StatelessWidget {
         builder: (context) =>
             FullScreenImageView(imageUrl: imageUrl, title: outfitName),
       ),
+    );
+  }
+
+  void _openOutfitPreview(BuildContext context, Map<String, dynamic> outfit) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Outfit Preview',
+      barrierColor: Colors.transparent,
+      transitionDuration: Duration(milliseconds: 300),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return OutfitPreviewModal(
+          outfit: outfit,
+          onDelete: onDeleteOutfit != null
+              ? () {
+                  final outfitId = outfit['id']?.toString() ?? '';
+                  if (outfitId.isNotEmpty) {
+                    onDeleteOutfit!(outfitId);
+                  }
+                }
+              : null,
+          onUpdate: () {
+            // TODO: Implement update functionality
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Actualizar outfit - Por implementar'),
+                duration: Duration(seconds: 2),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -137,6 +175,7 @@ class OutfitGridWidget extends StatelessWidget {
 
           return GestureDetector(
             onTap: () => _openFullScreenImage(context, imageUrl, name),
+            onLongPress: () => _openOutfitPreview(context, outfit),
             child: Card(
               elevation: 4,
               shape: RoundedRectangleBorder(

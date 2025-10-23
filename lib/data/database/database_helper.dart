@@ -172,10 +172,24 @@ class DatabaseHelper {
 
   Future<int> deleteOutfit(String id) async {
     final db = await database;
+    int deletedRows = 0;
     await db.transaction((txn) async {
-      await txn.delete('outfit_items', where: 'outfitId = ?', whereArgs: [id]);
-      await txn.delete('outfits', where: 'id = ?', whereArgs: [id]);
+      // First, delete all outfit_items relationships
+      final outfitItemsDeleted = await txn.delete(
+        'outfit_items',
+        where: 'outfitId = ?',
+        whereArgs: [id],
+      );
+      print('Deleted $outfitItemsDeleted outfit_items relationships for outfit $id');
+
+      // Then, delete the outfit itself
+      deletedRows = await txn.delete(
+        'outfits',
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+      print('Deleted $deletedRows outfit record(s) with id $id');
     });
-    return 1;
+    return deletedRows;
   }
 }

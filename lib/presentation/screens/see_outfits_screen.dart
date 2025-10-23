@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:pintapp/presentation/widgets/outfit_grid_widget.dart';
 import 'package:pintapp/config/helpers/local_get_all_outfits_helper.dart';
+import 'package:pintapp/data/repositories/local_outfit_repository.dart';
+import 'package:pintapp/data/database/database_helper.dart';
+import 'package:pintapp/data/services/local_storage_service.dart';
+import 'package:pintapp/data/services/local_image_composition_service.dart';
 
 class SeeOutfitsScreen extends StatefulWidget {
   const SeeOutfitsScreen({super.key});
@@ -14,12 +18,19 @@ class _SeeOutfitsScreenState extends State<SeeOutfitsScreen> {
   bool isLoading = true;
   List<Map<String, dynamic>> outfits = [];
   final LocalGetAllOutfitsHelper _outfitsHelper = LocalGetAllOutfitsHelper();
+  late final LocalOutfitRepository _outfitRepository;
 
   final List<String> categories = ['All', 'Casual', 'Formal', 'Sport', 'Gym'];
 
   @override
   void initState() {
     super.initState();
+    final storageService = LocalStorageService();
+    _outfitRepository = LocalOutfitRepository(
+      DatabaseHelper(),
+      storageService,
+      LocalImageCompositionService(storageService),
+    );
     _loadOutfits();
   }
 
@@ -39,7 +50,7 @@ class _SeeOutfitsScreenState extends State<SeeOutfitsScreen> {
         isLoading = false;
       });
     } catch (e) {
-      print('Error loading outfits: $e');
+      debugPrint('Error loading outfits: $e');
       setState(() {
         outfits = [];
         isLoading = false;
@@ -98,6 +109,37 @@ class _SeeOutfitsScreenState extends State<SeeOutfitsScreen> {
         .toList();
   }
 
+  Future<void> _deleteOutfit(String outfitId) async {
+    try {
+      await _outfitRepository.deleteOutfit(outfitId);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Outfit eliminado exitosamente'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      // Reload outfits after deletion
+      await _loadOutfits();
+    } catch (e) {
+      debugPrint('Error deleting outfit: $e');
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al eliminar el outfit'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -150,7 +192,10 @@ class _SeeOutfitsScreenState extends State<SeeOutfitsScreen> {
           Expanded(
             child: isLoading
                 ? Center(child: CircularProgressIndicator())
-                : OutfitGridWidget(outfits: filteredOutfits),
+                : OutfitGridWidget(
+                    outfits: filteredOutfits,
+                    onDeleteOutfit: _deleteOutfit,
+                  ),
           ),
         ],
       ),
